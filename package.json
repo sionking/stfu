@@ -1,0 +1,25 @@
+{
+  "name": "stfu",
+  "version": "1.0.0",
+  "description": "Mute all instagram users",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "instagram-private-api": "0.6.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patrickclery/stfu.git"
+  },
+  "keywords": [
+    "instagram"
+  ],
+  "author": "@patrickclery",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/patrickclery/stfu/issues"
+  },
+  "homepage": "https://github.com/patrickclery/stfu#readme"
+}
