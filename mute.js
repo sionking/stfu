@@ -9,37 +9,28 @@ const device = new Client.Device(process.env.IG_USER);
 const storage = new Client.CookieFileStorage(`./cookies/${process.env.IG_USER}.json`);
 
 Client.Session.create(
-  device,
-  storage,
-  process.env.IG_USER,
-  process.env.IG_PASSWORD
-).then(session => {
-  return [session, Client.Account.searchForUser(session, process.env.IG_TEST_USER)]
+    device,
+    storage,
+    process.env.IG_USER,
+    process.env.IG_PASSWORD
+  )
+  .then(async session => {
+    let accountId = await session.getAccountId()
+    let feeds = await new Client.Feed.AccountFollowing(session, accountId, 400);
+    feeds.get()
+      .then(res => {
 
-}).spread((session, account) => {
-  // Mute the user
-  return Client.Relationship.mutePosts(session, account.id)
+        let kue = require('kue')
+          , queue = kue.createQueue();
 
-}).then(relationship => {
-    console.log(relationship)
-    // {followedBy: ... , following: ... }
-    // Yey, you just followed @instagram
+        const followings = res.map(account => account._params.id)
+
+        for (id of followings) {
+          Client.Account.muteStory(session, id)
+        }
+
+      })
   })
-
-
-
-//
-//
-// Client.Feed.AccountFollowing(
-//   session,
-//   accountId
-// ).spread((session, feed) => {
-//    // .all returns promise
-//   return feed.all()
-// }).then(followings => {
-//     // return Client.Relationship.create(session, account.id);
-//     console.log(followings)
-//   })
 
 // Get a list of all my followings
 
