@@ -18,13 +18,11 @@ queue.on('error', (err) => {
   console.log(`A queue error happened: ${err.message}`);
 });
 queue.on('failed', (job, err) => {
-  console.log(`Job ${job.id} failed with error ${err.message}`);
+  console.log(`FAILED: Mute ${job.data.username}: ${err.message}`);
 });
 queue.on('succeeded', job => {
-  console.log(`Job succeed for muting user ${job.data.username}`)
+  console.log(`SUCCESS: muted ${job.data.username}!`)
 });
-
-queue.checkHealth().then(counts => console.log(counts));
 
 const muteAllUsers = async () => {
 
@@ -43,7 +41,6 @@ const muteAllUsers = async () => {
     feed.get().then(followings => {
 
       for (let f of followings
-        .reverse()
         .slice(0, process.env.MAX_MUTES)
         ) {
 
@@ -62,11 +59,12 @@ const muteAllUsers = async () => {
 
       queue
         .process(1, (job, done) => {
-          console.log(`Processing job ${job.id} for ${job.data.username}.`);
+          console.log(`Started job ${job.id} for ${job.data.username}.`);
 
-          Client.Relationship.mutePosts(session, job.data.id).then(() => {
-            setTimeout(done, delay_in_ms)
-          })
+          Client.Relationship.mutePosts(session, job.data.id);
+          Client.Relationship.muteStory(session, job.data.id);
+
+          setTimeout(done, delay_in_ms)
         })
     })
   })
