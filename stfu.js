@@ -22,7 +22,7 @@ queue.on('failed', (job, err) => {
   console.log(`FAILED: Mute ${job.data.username}: ${err.message}`);
 });
 queue.on('succeeded', job => {
-  console.log(`SUCCESS: Processed ${job.data.username}!`)
+  // console.log(`Processed ${job.data.username}!`)
 });
 
 const muteAllUsers = async () => {
@@ -43,10 +43,10 @@ const muteAllUsers = async () => {
 
       for (let f of followings
         .reverse()
-        .slice(0, process.env.MAX_MUTES)
+        .slice(0, process.env.MAX_USERS)
         ) {
 
-        console.log(`Creating a job for ${f._params.username}.`);
+        // console.log(`Creating a job for ${f._params.username}.`);
 
         queue.createJob({
           username: f._params.username,
@@ -54,21 +54,21 @@ const muteAllUsers = async () => {
         })
           .save()
           .then(job => {
-            console.log(`Saved job ${job.id} for ${job.data.username}`)
+            // console.log(`Saved job ${job.id} for ${job.data.username}`)
           })
 
       }
 
       queue
         .process(1, (job, done) => {
-          console.log(`Started job ${job.id} for ${job.data.username}.`);
+          // console.log(`Started job ${job.id} for ${job.data.username}.`);
 
           Client.Relationship.get(session, job.data.id).then(rel => {
 
             if (whitelist.includes(job.data.username)) {
 
               if (!rel.params.muting && !rel.params.is_muting_reel) {
-                console.log(`WHITELIST: ${job.data.username} is already whitelisted.`);
+                // console.log(`WHITELIST: ${job.data.username} is already whitelisted.`);
                 done();
                 return;
               }
@@ -86,7 +86,7 @@ const muteAllUsers = async () => {
 
               // Check if the user is already muted
               if (rel.params.muting && rel.params.is_muting_reel) {
-                console.log(`SKIP: ${job.data.username} is already muted both.`);
+                // console.log(`SKIP: ${job.data.username} is already muted both.`);
                 done();
                 return
               }
